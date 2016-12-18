@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">aad-3-assg-2</string>
+
+    <string name="intro_message">
+        <![CDATA[
+
+                Assignment 2: This assignment introduces IntentService & Messages.
+                \n\nThis App downloads the most recent CNN YouTube listings and presents them to you below.
+
+        ]]>
+    </string>
+    <string name="toggle_log">Toggle Log</string>
+
+</resources>
