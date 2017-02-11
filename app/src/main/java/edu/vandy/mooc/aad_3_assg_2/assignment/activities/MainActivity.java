@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -80,6 +81,7 @@ public class MainActivity extends CustomLoggingActivityBase implements ServiceRe
      */
     private Handler mServiceResultHandler = null;
 
+    private final static int REQUEST_CODE = 1001;
     /*
      * Android Activity Lifecycle methods
      */
@@ -148,9 +150,9 @@ public class MainActivity extends CustomLoggingActivityBase implements ServiceRe
      */
     private void startDownload(Uri url) {
         // Create an intent to download the YouTube Atom Feed for CNN.
-        // TODO -- you fill in here.
-
-
+        Intent intent = DownloadAtomFeedService.makeIntent(
+                this.getApplicationContext(), MainActivity.REQUEST_CODE,
+                Uri.parse(MainActivity.CNN_YOUTUBE_ATOM_FEED_URL), mServiceResultHandler);
         Log.d(TAG,
                 "starting the DownloadAtomFeedService for "
                         + url.toString()
@@ -160,8 +162,7 @@ public class MainActivity extends CustomLoggingActivityBase implements ServiceRe
         viewFlipper.setDisplayedChild(mProgressFlipperIndex);
 
         // call startService on that Intent.
-        // TODO -- you fill in here.
-
+        startService(intent);
     }
 
     /**
@@ -183,22 +184,29 @@ public class MainActivity extends CustomLoggingActivityBase implements ServiceRe
 
         // check if resultCode = Activity.RESULT_CANCELED, if it does, then call
         // handleDownloadFailure and return;
-        // TODO -- you fill in here.
-
+        if (resultCode == Activity.RESULT_CANCELED) {
+            handleDownloadFailure(data);
+            return;
+        }
 
         // Otherwise **resultCode == Activity.RESULT_OK**
         // Handle a successful download.
         // Log to both the on-screen & logcat logs the requestUri from the data.
-        // TODO -- you fill in here.
-
+        if (resultCode == Activity.RESULT_OK) {
+            String text = "Success! " + data.getString("FEED_URL");
+            Log.i(MainActivity.TAG, text);
+            Toast.makeText(this, text, Toast.LENGTH_LONG).show();
+        }
 
         // Get the Entries from the 'data' and store them.
         // Log to the on-screen and logcat logs the number of entries downloaded.
-        // TODO -- you fill in here.
-
+        ArrayList<Entry> feeds = data.getParcelableArrayList("ENTRY_ARRAY_KEY");
+        String text = "Downloaded " + feeds.size() + " entries!";
+        Log.i(MainActivity.TAG, text);
+        Toast.makeText(this, text, Toast.LENGTH_LONG).show();
 
         // Update the RecyclerView fragment via calling updateEntries(...) on it.
-        // TODO -- you fill in here.
+        updateEntriesInterface.updateEntries(feeds);
 
     }
 
@@ -315,7 +323,7 @@ public class MainActivity extends CustomLoggingActivityBase implements ServiceRe
 
                 // call startDownload(...) with the Uri version of
                 // CNN_YOUTUBE_ATOM_FEED_URL
-                // TODO -- you fill in here.
+                startDownload(Uri.parse(MainActivity.this.CNN_YOUTUBE_ATOM_FEED_URL));
 
             }
         });
